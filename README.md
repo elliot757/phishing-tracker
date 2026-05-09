@@ -117,34 +117,6 @@ phishing-tracker/
    - Detailed detection feed
    - Trend analysis charts
 
-## 🎨 Customization
-
-### Change Color Scheme
-Edit CSS variables in `styles.css`:
-```css
-:root {
-    --primary-color: #378ADD;
-    --danger-color: #E24B4A;
-    /* ... more colors ... */
-}
-```
-
-### Add Real Data
-Replace simulated data in `data.js` with real threat intelligence from:
-- Proofpoint APIs
-- Mimecast threat feeds
-- Cisco Talos
-- Microsoft Graph Security
-- Custom data sources
-
-### Modify Update Frequency
-In `dashboard.js`, change the interval:
-```javascript
-updateInterval = setInterval(() => {
-    // Update logic
-}, 15000); // Change from 15 seconds
-```
-
 ## 📈 Statistics
 
 - **Total Dashboard Code**: ~1000 lines
@@ -159,12 +131,6 @@ This project is for **educational purposes only**. It demonstrates:
 - How threat intelligence dashboards work
 - Visualization techniques for security data
 - Real-world cybersecurity concepts
-
-### Important Notes:
-- Uses simulated/sample data, not real phishing statistics
-- Does not collect personal information
-- Does not connect to external threat databases by default
-- Fully client-side processing (no backend required)
 
 For detailed security information, see [SECURITY.md](SECURITY.md)
 
@@ -200,7 +166,6 @@ of this software and associated documentation files...
 
 - **Issues**: Report bugs via [GitHub Issues](https://github.com/elliot757/phishing-tracker/issues)
 - **Discussions**: Join [GitHub Discussions](https://github.com/elliot757/phishing-tracker/discussions)
-- **Email**: your-email@example.com
 
 ## 🚀 Roadmap
 
@@ -251,7 +216,3 @@ Learn more about phishing and cybersecurity:
 - [LICENSE](LICENSE) - MIT License details
 
 ---
-
-**Made with ❤️ for cybersecurity education**
-
-Last Updated: January 2024 | Version 1.0.0
