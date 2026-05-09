@@ -38,7 +38,7 @@ A real-time, interactive web-based dashboard that visualizes phishing email thre
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/phishing-tracker.git
+git clone https://github.com/elliot757/phishing-tracker.git
 cd phishing-tracker
 ```
 
@@ -198,8 +198,8 @@ of this software and associated documentation files...
 
 ## 📞 Support & Contact
 
-- **Issues**: Report bugs via [GitHub Issues](https://github.com/yourusername/phishing-tracker/issues)
-- **Discussions**: Join [GitHub Discussions](https://github.com/yourusername/phishing-tracker/discussions)
+- **Issues**: Report bugs via [GitHub Issues](https://github.com/elliot757/phishing-tracker/issues)
+- **Discussions**: Join [GitHub Discussions](https://github.com/elliot757/phishing-tracker/discussions)
 - **Email**: your-email@example.com
 
 ## 🚀 Roadmap
