@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Global Phishing Email Tracker - Real-time visualization of phishing threats worldwide">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Global Phishing Tracker - Real-Time Threat Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f2e;
+            --bg-tertiary: #242d3d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --text-tertiary: #707070;
+            --border-color: #2a3345;
+            --accent-blue: #378ADD;
+            --accent-teal: #1D9E75;
+            --accent-orange: #BA7517;
+            --accent-coral: #D85A30;
+            --accent-pink: #993556;
+            --accent-green: #639922;
+        }
+
+        body.light-mode {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #f0f2f5;
+            --text-primary: #2c3e50;
+            --text-secondary: #666666;
+            --text-tertiary: #999999;
+            --border-color: #d3d3d3;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #185FA5 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--border-color);
+            transform: scale(1.05);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-icon {
+            font-size: 18px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Filters */
+        .filters-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent-blue);
+            background: var(--bg-tertiary);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin-bottom: 1rem;
+        }
+
+        .legend {
+            display: grid;
+            gap: 10px;
+            font-size: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .legend-label {
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        .legend-percent {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Heatmap */
+        .heatmap-section {
+            margin-bottom: 2rem;
+        }
+
+        .heatmap-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            min-height: 450px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #world-map {
+            width: 100%;
+            height: 400px;
+        }
+
+        .map-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .map-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .legend-color-box {
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+        }
+
+        /* Regions Table */
+        .regions-section {
+            margin-bottom: 2rem;
+        }
+
+        .table-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        tbody tr {
+            transition: background-color 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Detections */
+        .detections-section {
+            margin-bottom: 2rem;
+        }
+
+        .detections-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .detection-item {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-left: 3px solid var(--accent-blue);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: grid;
+            grid-template-columns: 80px 1fr 150px 100px;
+            gap: 12px;
+            align-items: center;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .detection-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .detection-time {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        .detection-region {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .detection-details {
+            color: var(--text-secondary);
+        }
+
+        .detection-status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .status-blocked {
+            background: rgba(99, 153, 34, 0.2);
+            color: var(--accent-green);
+        }
+
+        .status-flagged {
+            background: rgba(186, 117, 23, 0.2);
+            color: var(--accent-orange);
+        }
+
+        /* About Section */
+        .about-section {
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .info-card p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .info-card strong {
+            color: var(--text-primary);
+        }
+
+        .info-card ul {
+            margin: 1rem 0 1rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .info-card li {
+            margin-bottom: 8px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .footer-content p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-teal);
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .detection-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .section-title {
+                font-size: 16px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">🛡️</div>
+                <span>Global Phishing Tracker</span>
+            </div>
+            <div class="nav-right">
+                <div class="live-badge">
+                    <div class="live-dot"></div>
+                    <span id="live-time">LIVE</span>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Real-Time Phishing Threat Intelligence</h1>
+            <p>Global detection and analysis of phishing email campaigns</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">
+                    <span class="stat-icon">📧</span>
+                    Emails Detected Today
+                </div>
+                <div class="stat-value" id="total-count">1.2M</div>
+                <div class="stat-change" id="total-change">↑ 45K since yesterday</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">
+                    <span class="stat-icon">🌍</span>
+                    Countries Affected
+                </div>
+                <div class="stat-value" id="country-count">157</div>
+                <div class="stat-change">Across all continents</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">
+                    <span class="stat-icon">⚠️</span>
+                    Top Threat Type
+                </div>
+                <div class="stat-value" id="threat-type">Credential</div>
+                <div class="stat-change">34% of all phishing</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">
+                    <span class="stat-icon">✅</span>
+                    Block Rate
+                </div>
+                <div class="stat-value">98.7%</div>
+                <div class="stat-change">Excellent detection rate</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <h2 class="section-title">Threat Filters</h2>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterBy('all')">All Threats</button>
+                <button class="filter-btn" onclick="filterBy('banking')">Banking Fraud</button>
+                <button class="filter-btn" onclick="filterBy('cloud')">Cloud Services</button>
+                <button class="filter-btn" onclick="filterBy('ecommerce')">E-commerce</button>
+                <button class="filter-btn" onclick="filterBy('social')">Social Media</button>
+            </div>
+        </div>
+
+        <!-- Heatmap -->
+        <div class="heatmap-section">
+            <h2 class="section-title">Global Threat Heatmap</h2>
+            <div class="heatmap-container">
+                <svg id="world-map"></svg>
+                <div class="map-legend">
+                    <div class="map-legend-item">
+                        <div class="legend-color-box" style="background: #B5D4F4;"></div>
+                        <span>Low</span>
+                    </div>
+                    <div class="map-legend-item">
+                        <div class="legend-color-box" style="background: #85B7EB;"></div>
+                        <span>Moderate</span>
+                    </div>
+                    <div class="map-legend-item">
+                        <div class="legend-color-box" style="background: #378ADD;"></div>
+                        <span>High</span>
+                    </div>
+                    <div class="map-legend-item">
+                        <div class="legend-color-box" style="background: #185FA5;"></div>
+                        <span>Very High</span>
+                    </div>
+                    <div class="map-legend-item">
+                        <div class="legend-color-box" style="background: #042C53;"></div>
+                        <span>Critical</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regions Table -->
+        <div class="regions-section">
+            <h2 class="section-title">Top 10 Affected Regions</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>Emails Detected</th>
+                            <th>% of Global</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-regions">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <h3>Attack Type Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="threat-chart"></canvas>
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-blue);"></div>
+                        <span class="legend-label">Credential theft</span>
+                        <span class="legend-percent">34%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-teal);"></div>
+                        <span class="legend-label">Banking trojan</span>
+                        <span class="legend-percent">22%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-coral);"></div>
+                        <span class="legend-label">Package delivery</span>
+                        <span class="legend-percent">18%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-orange);"></div>
+                        <span class="legend-label">Cloud impersonation</span>
+                        <span class="legend-percent">15%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-pink);"></div>
+                        <span class="legend-label">CEO fraud</span>
+                        <span class="legend-percent">11%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>24-Hour Detection Trend</h3>
+                <div class="chart-container">
+                    <canvas id="trend-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Detections -->
+        <div class="detections-section">
+            <h2 class="section-title">📡 Recent Detections (Live Feed)</h2>
+            <div class="detections-container">
+                <div id="recent-detections"></div>
+            </div>
+        </div>
+
+        <!-- About -->
+        <div class="about-section">
+            <div class="info-card">
+                <h3>About This Dashboard</h3>
+                <p><strong>What is this?</strong> The Global Phishing Tracker is an educational cybersecurity dashboard that visualizes how phishing emails are detected across the world in real-time.</p>
+                <p><strong>Data Source:</strong> This dashboard simulates real threat intelligence data. In production, it aggregates data from:</p>
+                <ul>
+                    <li>Corporate email security gateways (Microsoft Defender, Proofpoint, Mimecast)</li>
+                    <li>User phishing reports and spam complaints</li>
+                    <li>Email authentication protocols (DMARC, SPF, DKIM)</li>
+                    <li>URL reputation and domain analysis services</li>
+                    <li>Machine learning models detecting suspicious patterns</li>
+                </ul>
+                <p><strong>Live Updates:</strong> This dashboard updates every 5 seconds with new threat data. The detection feed, metrics, and trends are all refreshed in real-time.</p>
+                <p><strong>Educational Purpose:</strong> This project demonstrates cybersecurity concepts and threat visualization techniques. Perfect for learning about phishing, security operations, and data visualization.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2024 Global Phishing Tracker. Educational cybersecurity project.</p>
+            <div class="footer-links">
+                <a href="https://github.com" target="_blank">GitHub</a>
+                <a href="#" onclick="alert('This is an educational project. No real threat data is collected or displayed.'); return false;">Security</a>
+                <a href="#" onclick="alert('MIT License - Free to use, modify, and distribute'); return false;">License</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+
+    <script>
+        // ========== THEME TOGGLE ==========
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.querySelector('.theme-toggle');
+            
+            if (body.classList.contains('light-mode')) {
+                body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+                btn.textContent = '🌙 Dark';
+            } else {
+                body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+                btn.textContent = '☀️ Light';
+            }
+
+            // Refresh charts for new theme
+            if (threatChart) threatChart.destroy();
+            if (trendChart) trendChart.destroy();
+            renderCharts();
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (saved === 'light' || (!saved && !prefersDark)) {
+                document.body.classList.add('light-mode');
+                document.querySelector('.theme-toggle').textContent = '☀️ Light';
+            }
+        }
+
+        // ========== DATA ==========
+        const regions = [
+            { name: 'United States', count: 185000, code: 'USA' },
+            { name: 'India', count: 142000, code: 'IND' },
+            { name: 'United Kingdom', count: 98000, code: 'GBR' },
+            { name: 'Germany', count: 87000, code: 'DEU' },
+            { name: 'Canada', count: 76000, code: 'CAN' },
+            { name: 'Australia', count: 65000, code: 'AUS' },
+            { name: 'France', count: 58000, code: 'FRA' },
+            { name: 'Brazil', count: 52000, code: 'BRA' },
+            { name: 'Japan', count: 48000, code: 'JPN' },
+            { name: 'Mexico', count: 42000, code: 'MEX' }
+        ];
+
+        const threatTypes = {
+            'Credential theft': 34,
+            'Banking trojan': 22,
+            'Package delivery': 18,
+            'Cloud impersonation': 15,
+            'CEO fraud': 11
+        };
+
+        let detectionSamples = [
+            { time: '14:23:45', region: 'United States', type: 'Credential theft', target: 'Office 365', status: 'Blocked' },
+            { time: '14:19:32', region: 'India', type: 'Banking trojan', target: 'ICICI Bank', status: 'Blocked' },
+            { time: '14:15:18', region: 'United Kingdom', type: 'CEO fraud', target: 'Barclays', status: 'Flagged' },
+            { time: '14:11:56', region: 'Germany', type: 'Package delivery', target: 'DHL', status: 'Blocked' },
+            { time: '14:08:23', region: 'Canada', type: 'Cloud impersonation', target: 'Google Drive', status: 'Blocked' },
+            { time: '14:05:47', region: 'Australia', type: 'Credential theft', target: 'Amazon', status: 'Blocked' },
+            { time: '14:02:15', region: 'France', type: 'Banking trojan', target: 'BNP Paribas', status: 'Flagged' },
+            { time: '13:58:39', region: 'Brazil', type: 'Package delivery', target: 'Correios', status: 'Blocked' }
+        ];
+
+        let threatChart, trendChart;
+
+        // ========== RENDER CHARTS ==========
+        function renderCharts() {
+            const threatCtx = document.getElementById('threat-chart');
+            if (threatCtx) {
+                threatChart = new Chart(threatCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(threatTypes),
+                        datasets: [{
+                            data: Object.values(threatTypes),
+                            backgroundColor: ['#378ADD', '#1D9E75', '#D85A30', '#BA7517', '#993556'],
+                            borderColor: document.body.classList.contains('light-mode') ? '#ffffff' : '#1a1f2e',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+
+            const trendCtx = document.getElementById('trend-chart');
+            if (trendCtx) {
+                const hours = Array.from({length: 24}, (_, i) => (i).toString().padStart(2, '0') + ':00');
+                const data24h = [45, 52, 38, 41, 55, 62, 71, 68, 64, 59, 63, 72, 78, 82, 75, 69, 71, 68, 64, 59, 65, 72, 81, 92].map(v => v * 10000);
+                
+                trendChart = new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: hours,
+                        datasets: [{
+                            label: 'Emails',
+                            data: data24h,
+                            borderColor: '#378ADD',
+                            backgroundColor: 'rgba(55, 138, 221, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                ticks: { callback: v => (v / 1000000).toFixed(1) + 'M' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // ========== RENDER REGIONS TABLE ==========
+        function renderRegions() {
+            const total = regions.reduce((sum, r) => sum + r.count, 0);
+            const tbody = document.getElementById('top-regions');
+            
+            tbody.innerHTML = regions.map(r => {
+                const percent = Math.round((r.count / total) * 100);
+                const trend = Math.random() > 0.5 ? 'up' : 'down';
+                const color = trend === 'up' ? 'var(--accent-coral)' : 'var(--accent-green)';
+                const symbol = trend === 'up' ? '↑' : '↓';
+                const change = (Math.random() * 10).toFixed(1);
+                
+                return `
+                    <tr>
+                        <td>${r.name}</td>
+                        <td>${(r.count / 1000).toFixed(0)}K</td>
+                        <td>${percent}%</td>
+                        <td style="color: ${color};">${symbol} ${change}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ========== RENDER DETECTIONS ==========
+        function renderDetections() {
+            const container = document.getElementById('recent-detections');
+            
+            const html = detectionSamples.map(d => {
+                const colors = {
+                    'Credential theft': '#378ADD',
+                    'Banking trojan': '#1D9E75',
+                    'CEO fraud': '#BA7517',
+                    'Package delivery': '#D85A30',
+                    'Cloud impersonation': '#993556'
+                };
+                
+                return `
+                    <div class="detection-item" style="border-left-color: ${colors[d.type] || '#378ADD'};">
+                        <div class="detection-time">${d.time}</div>
+                        <div>
+                            <div class="detection-region">${d.region}</div>
+                            <div class="detection-details">${d.type} • ${d.target}</div>
+                        </div>
+                        <div class="detection-details">${d.type}</div>
+                        <div class="detection-status ${d.status === 'Blocked' ? 'status-blocked' : 'status-flagged'}">${d.status}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+
+        // ========== FILTER FUNCTION ==========
+        function filterBy(type) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // ========== DRAW WORLD MAP ==========
+        function drawMap() {
+            const svg = d3.select('#world-map');
+            svg.selectAll('*').remove();
+
+            const projection = d3.geoNaturalEarth1().scale(150).translate([300, 180]);
+            const path = d3.geoPath(projection);
+            
+            const codeToCountry = {
+                '840': 'USA', '356': 'IND', '826': 'GBR', '276': 'DEU', 
+                '124': 'CAN', '036': 'AUS', '250': 'FRA', '076': 'BRA', 
+                '392': 'JPN', '484': 'MEX'
+            };
+            
+            const valuesByCountry = {};
+            regions.forEach(r => {
+                valuesByCountry[r.code] = Math.log(r.count + 1);
+            });
+
+            const isDark = !document.body.classList.contains('light-mode');
+            const colorScale = d3.scaleQuantize(
+                [0, 12],
+                isDark 
+                    ? ['#042C53', '#185FA5', '#378ADD', '#85B7EB', '#B5D4F4']
+                    : ['#B5D4F4', '#85B7EB', '#378ADD', '#185FA5', '#042C53']
+            );
+
+            d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+                .then(world => {
+                    const countries = topojson.feature(world, world.objects.countries).features;
+                    
+                    svg.append('rect')
+                        .attr('width', '100%')
+                        .attr('height', '100%')
+                        .attr('fill', isDark ? '#242d3d' : '#f0f2f5');
+                    
+                    svg.selectAll('path')
+                        .data(countries)
+                        .enter()
+                        .append('path')
+                        .attr('d', path)
+                        .attr('fill', d => {
+                            const codeToData = {
+                                '840': 'USA', '356': 'IND', '826': 'GBR', '276': 'DEU',
+                                '124': 'CAN', '036': 'AUS', '250': 'FRA', '076': 'BRA',
+                                '392': 'JPN', '484': 'MEX'
+                            };
+                            const countryCode = codeToData[d.id];
+                            const val = valuesByCountry[countryCode] || 0;
+                            return colorScale(val);
+                        })
+                        .attr('stroke', isDark ? 'rgba(255,255,255,0.1)' : '#ddd')
+                        .attr('stroke-width', 0.5)
+                        .style('cursor', 'pointer');
+                });
+        }
+
+        // ========== LIVE UPDATES ==========
+        function addNewDetection() {
+            const threatTypesList = Object.keys(threatTypes);
+            const threat = threatTypesList[Math.floor(Math.random() * threatTypesList.length)];
+            const region = regions[Math.floor(Math.random() * regions.length)];
+            
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'Asia/Kolkata'
+            });
+
+            const newDetection = {
+                time: time,
+                region: region.name,
+                type: threat,
+                target: `Active Threat ${Math.floor(Math.random() * 1000)}`,
+                status: Math.random() > 0.3 ? 'Blocked' : 'Flagged'
+            };
+
+            detectionSamples.unshift(newDetection);
+            if (detectionSamples.length > 8) detectionSamples.pop();
+
+            renderDetections();
+        }
+
+        function updateLiveTime() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Asia/Kolkata'
+            });
+            document.getElementById('live-time').textContent = `LIVE - ${time} IST`;
+        }
+
+        function updateMetrics() {
+            document.getElementById('total-count').textContent = (Math.random() * 0.5 + 0.8).toFixed(1) + 'M';
+            document.getElementById('total-change').textContent = '↑ ' + Math.floor(Math.random() * 50000) + 'K since yesterday';
+        }
+
+        // ========== INITIALIZE ==========
+        window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderCharts();
+            renderRegions();
+            renderDetections();
+            drawMap();
+            updateLiveTime();
+        });
+
+        // ========== LIVE UPDATE INTERVALS ==========
+        setInterval(updateLiveTime, 1000);       // Update time every second
+        setInterval(addNewDetection, 5000);      // Add new detection every 5 seconds
+        setInterval(updateMetrics, 10000);       // Update metrics every 10 seconds
+        setInterval(() => {
+            regions.forEach(r => {
+                r.count += Math.floor(Math.random() * 1000) - 500;
+                r.count = Math.max(r.count, 0);
+            });
+            renderRegions();
+        }, 15000);  // Update regions every 15 seconds
+    </script>
+</body>
+</html>
