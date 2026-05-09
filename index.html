@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Global Phishing Email Tracker - Real-time visualization of phishing threats worldwide">
+    <meta name="keywords" content="phishing, cybersecurity, threat intelligence, tracking, dashboard">
+    <title>Global Phishing Tracker - Real-Time Threat Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <i class="icon-shield"></i>
+                    <span>Global Phishing Tracker</span>
+                </div>
+                <div class="nav-info">
+                    <span class="live-indicator">● LIVE</span>
+                    <span class="timestamp" id="timestamp">Last updated: just now</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Summary Stats -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Emails detected today</div>
+                <div class="stat-value" id="total-count">1.2M</div>
+                <div class="stat-change" id="total-change">+45K since last hour</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Countries affected</div>
+                <div class="stat-value" id="country-count">157</div>
+                <div class="stat-change">Across all continents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Top threat type</div>
+                <div class="stat-value" id="threat-type">Credential theft</div>
+                <div class="stat-change">34% of all phishing</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Update frequency</div>
+                <div class="stat-value">Live (15 sec)</div>
+                <div class="stat-change">Real-time tracking</div>
+            </div>
+        </section>
+
+        <!-- Filter Section -->
+        <section class="filters-section">
+            <h2 class="section-title">Threat Filters</h2>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterBy('all')" id="filter-all">All threats</button>
+                <button class="filter-btn" onclick="filterBy('banking')" id="filter-banking">Banking fraud</button>
+                <button class="filter-btn" onclick="filterBy('cloud')" id="filter-cloud">Cloud services</button>
+                <button class="filter-btn" onclick="filterBy('ecommerce')" id="filter-ecommerce">E-commerce</button>
+                <button class="filter-btn" onclick="filterBy('social')" id="filter-social">Social media</button>
+            </div>
+        </section>
+
+        <!-- Global Heatmap -->
+        <section class="heatmap-section">
+            <h2 class="section-title">Global Threat Heatmap</h2>
+            <div class="heatmap-container">
+                <svg id="world-map" role="img" aria-label="World map showing phishing email detections by country"></svg>
+            </div>
+            <div class="map-legend">
+                <span class="legend-item"><span class="legend-color" style="background: #B5D4F4;"></span>Low</span>
+                <span class="legend-item"><span class="legend-color" style="background: #85B7EB;"></span>Moderate</span>
+                <span class="legend-item"><span class="legend-color" style="background: #378ADD;"></span>High</span>
+                <span class="legend-item"><span class="legend-color" style="background: #185FA5;"></span>Very High</span>
+                <span class="legend-item"><span class="legend-color" style="background: #042C53;"></span>Critical</span>
+            </div>
+        </section>
+
+        <!-- Top Regions Table -->
+        <section class="regions-section">
+            <h2 class="section-title">Top 10 Affected Regions</h2>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Country/Region</th>
+                            <th>Emails Detected</th>
+                            <th>% of Global</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-regions"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">Attack Type Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="threat-chart" role="img" aria-label="Pie chart of phishing attack types distribution"></canvas>
+                    </div>
+                    <div class="chart-legend" id="threat-legend"></div>
+                </div>
+
+                <div class="chart-card">
+                    <h3 class="chart-title">24-Hour Detection Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="trend-chart" role="img" aria-label="Line chart of phishing emails detected over 24 hours"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Detections -->
+        <section class="detections-section">
+            <h2 class="section-title">Recent Detections (Live Feed)</h2>
+            <div class="detections-container">
+                <div id="recent-detections"></div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about-section">
+            <div class="info-card">
+                <h3>About This Dashboard</h3>
+                <p><strong>What is this?</strong> The Global Phishing Tracker is an educational cybersecurity dashboard that visualizes how phishing emails are detected across the world in real-time.</p>
+                
+                <p><strong>Data Source:</strong> This dashboard uses simulated threat intelligence data that represents how real phishing tracking works. Actual systems aggregate data from:</p>
+                <ul>
+                    <li>Corporate email security gateways (Microsoft Defender, Proofpoint)</li>
+                    <li>User phishing reports and spam complaints</li>
+                    <li>Email authentication protocols (DMARC, SPF, DKIM)</li>
+                    <li>URL reputation and domain analysis services</li>
+                    <li>Machine learning models detecting suspicious patterns</li>
+                </ul>
+
+                <p><strong>Why does this matter?</strong> Phishing is the #1 attack vector for data breaches. Understanding global threat patterns helps organizations implement better security defenses.</p>
+
+                <p><strong>Educational Purpose:</strong> This project demonstrates cybersecurity concepts and threat visualization techniques. It's not a replacement for professional threat intelligence services.</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 Global Phishing Tracker. Educational cybersecurity project.</p>
+                <div class="footer-links">
+                    <a href="https://github.com/yourusername/phishing-tracker" target="_blank">GitHub</a>
+                    <a href="SECURITY.md">Security</a>
+                    <a href="LICENSE">License</a>
+                    <a href="CONTRIBUTING.md">Contributing</a>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script src="data.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
